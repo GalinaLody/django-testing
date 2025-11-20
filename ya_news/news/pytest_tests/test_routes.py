@@ -2,7 +2,7 @@ import pytest
 from http import HTTPStatus
 
 from django.urls import reverse
-from pytest_lazy_fixtures import lf
+from pytest_lazy_fixture import lf
 from pytest_django.asserts import assertRedirects
 
 

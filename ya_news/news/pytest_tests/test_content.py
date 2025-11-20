@@ -1,7 +1,7 @@
 import pytest
 
 from django.urls import reverse
-from pytest_lazy_fixtures import lf
+from pytest_lazy_fixture import lf
 
 
 @pytest.mark.usefixtures('news_11')
