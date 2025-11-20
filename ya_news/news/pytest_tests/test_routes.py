@@ -2,7 +2,7 @@ import pytest
 from http import HTTPStatus
 
 from django.urls import reverse
-from pytest_lazy_fixture import lf
+from pytest_lazyfixture import lazy_fixture
 from pytest_django.asserts import assertRedirects
 
 
@@ -33,8 +33,8 @@ def test_page_availability_for_anonymous_user(client, name, args):
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     [
-        (lf('not_author_client'), HTTPStatus.NOT_FOUND),
-        (lf('author_client'), HTTPStatus.OK)
+        (lazy_fixture('not_author_client'), HTTPStatus.NOT_FOUND),
+        (lazy_fixture('author_client'), HTTPStatus.OK)
     ],
 )
 @pytest.mark.parametrize(
@@ -55,8 +55,8 @@ def test_pages_availability_for_different_users(
 @pytest.mark.parametrize(
     'name, args',
     (
-        ('news:edit', lf('comment_id_for_args')),
-        ('news:delete', lf('comment_id_for_args')),
+        ('news:edit', lazy_fixture('comment_id_for_args')),
+        ('news:delete', lazy_fixture('comment_id_for_args')),
     ),
 )
 def test_redirects(client, name, args):

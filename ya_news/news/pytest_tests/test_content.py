@@ -1,7 +1,7 @@
 import pytest
 
 from django.urls import reverse
-from pytest_lazy_fixture import lf
+from pytest_lazyfixture import lazy_fixture
 
 
 @pytest.mark.usefixtures('news_11')
@@ -44,8 +44,8 @@ def comments_order(news, news_id_for_args, not_author_client):
 @pytest.mark.parametrize(
     'parametrized_client, form_in_context',
     (
-        (lf('not_author_client'), True),
-        (lf('client'), False),
+        (lazy_fixture('not_author_client'), True),
+        (lazy_fixture('client'), False),
     )
 )
 def test_add_comment_for_different_users(
