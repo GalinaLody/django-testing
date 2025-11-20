@@ -7,7 +7,8 @@ from pytest_lazy_fixtures import lf
 @pytest.mark.usefixtures('news_11')
 def test_not_more_ten_news_on_home_page(client):
     """Проверяет, что на главной странице
-    отображается не более 10 страниц."""
+    отображается не более 10 страниц.
+    """
     url = reverse('news:home')
     response = client.get(url)
     object_list = response.context['object_list']
@@ -28,7 +29,8 @@ def test_news_order(client):
 
 def comments_order(news, news_id_for_args, not_author_client):
     """Проверяет, что комментарии на странице отсортированы
-    в порядке возрастания."""
+    в порядке возрастания.
+    """
     url = reverse('news:detail', args=news_id_for_args)
     response = not_author_client.get(url)
     news = response.context['news']
@@ -52,7 +54,8 @@ def test_add_comment_for_different_users(
     news_id_for_args
 ):
     """Проверяет, что форма для отправки комментов доступна
-    только авторизованному пользователю и не доступна анонимному."""
+    только авторизованному пользователю и не доступна анонимному.
+    """
     url = reverse('news:detail', args=news_id_for_args)
     response = parametrized_client.get(url)
     assert ('form' in response.context) is form_in_context

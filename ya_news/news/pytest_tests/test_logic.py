@@ -1,5 +1,3 @@
-import pytest
-
 from http import HTTPStatus
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertFormError
@@ -41,7 +39,8 @@ def test_user_cant_use_bad_words(
         form_comment_data
 ):
     """Если комментарий содержит запрещённые слова, он не будет опубликован,
-    а форма вернёт ошибку."""
+    а форма вернёт ошибку.
+    """
     url = reverse('news:edit', args=comment_id_for_args)
     form_comment_data['text'] = f'Какой-то текст, {BAD_WORDS[0]}, еще текст'
     response = author_client.post(url, data=form_comment_data)

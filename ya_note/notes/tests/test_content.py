@@ -24,7 +24,8 @@ class TestDetailNote(TestCase):
     def test_notes_list_for_different_users(self):
         """Проверяет, что отдельная заметка передается в список заметок автора
         и не передается в список заметок
-        другого авторизованного пользователя-не автора. """
+        другого авторизованного пользователя-не автора.
+        """
         note_in_list = (
             (self.author, True),
             (self.not_author, False),
@@ -39,7 +40,8 @@ class TestDetailNote(TestCase):
 
     def test_add_and_create_pages_has_form(self):
         """Проверяет наличие формы на страницах добавления и редактирования
-        заметки."""
+        заметки.
+        """
         urls = (
             ('notes:edit', (self.note.slug,)),
             ('notes:add', None),

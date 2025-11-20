@@ -27,7 +27,8 @@ class TestNoteCreation(TestCase):
 
     def test_user_can_create_note(self):
         """Проверяет, что залогиненный пользователь
-        может создавать заметки."""
+        может создавать заметки.
+        """
         response = self.auth_client.post(self.url, data=self.form_data)
         self.assertRedirects(response, reverse('notes:success'))
         notes_count = Note.objects.count()
@@ -40,14 +41,16 @@ class TestNoteCreation(TestCase):
 
     def test_anonimous_cant_create_note(self):
         """Проверяет, что анонимный пользователь
-        не может создавать заметки."""
+        не может создавать заметки.
+        """
         self.client.post(self.url, data=self.form_data)
         notes_count = Note.objects.count()
         self.assertEqual(notes_count, 0)
 
     def test_not_unique_slug(self):
         """Проверяет, что нельзя создать заметки
-        с одинаковыми слагами."""
+        с одинаковыми слагами.
+        """
         self.note = Note.objects.create(
             title='Заголовок',
             text='Текст заметки',
@@ -66,7 +69,8 @@ class TestNoteCreation(TestCase):
 
     def test_empty_slug(self):
         """Проверяет, что при создании заметки с пустым полем для слага
-        слаг формируетс автоматически из названия."""
+        слаг формируетс автоматически из названия.
+        """
         self.form_data.pop('slug')
         response = self.auth_client.post(self.url, data=self.form_data)
         self.assertRedirects(response, reverse('notes:success'))
