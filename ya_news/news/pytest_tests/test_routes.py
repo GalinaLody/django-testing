@@ -11,7 +11,7 @@ from pytest_django.asserts import assertRedirects
     'name, args',
     [
         ('news:home', None),
-        ('news:detail', lf('news_id_for_args')),
+        ('news:detail', lazy_fixture('news_id_for_args')),
         ('users:login', None),
         ('users:signup', None),
         ('users:logout', None)
