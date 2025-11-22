@@ -124,10 +124,7 @@ def test_not_author_cant_delete_comment(
     assert comment.author == comment_from_db.author
 
 
-@pytest.mark.parametrize(
-        'bad_word',
-        BAD_WORDS
-)
+@pytest.mark.parametrize('bad_word', BAD_WORDS)
 def test_user_cant_use_bad_words(
         author_client, comment,
         comment_edit_url, bad_word

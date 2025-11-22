@@ -38,7 +38,8 @@ def test_pages_availability_for_different_users_and_anonymous(
 ):
     """Проверяет доступность различных страниц сайта пользователям
     в зависимости от их статуса:
-    анонимный пользователь, авторизованный пользователь, автор комментарий."""
+    анонимный пользователь, авторизованный пользователь, автор комментарий.
+    """
     if url == user_logout_url:
         response = parametrized_client.post(url)
     else:
@@ -46,10 +47,7 @@ def test_pages_availability_for_different_users_and_anonymous(
     assert response.status_code == expected_status
 
 
-@pytest.mark.parametrize(
-        'url',
-        (COMMENT_EDIT_URL, COMMENT_DELETE_URL)
-)
+@pytest.mark.parametrize('url', (COMMENT_EDIT_URL, COMMENT_DELETE_URL))
 def test_redirects(client, url, user_login_url):
     """Анонимный пользователь, при попытке перейти на страницу
     удаления/редактирования комментариев перенаправляется

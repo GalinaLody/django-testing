@@ -10,8 +10,8 @@ def test_not_more_ten_news_on_home_page(
 ):
     """Проверяет, что на главной странице отображается не более 10 страниц."""
     assert (
-        client.get(home_page_url).context['object_list'].count() ==
-        settings.NEWS_COUNT_ON_HOME_PAGE
+        client.get(home_page_url).context['object_list'].count()
+        == settings.NEWS_COUNT_ON_HOME_PAGE
     )
 
 
@@ -22,7 +22,7 @@ def test_news_order(
 ):
     """Проверяет, что посты отсортированны по датам в порядке убывания."""
     all_dates = [
-        news.date 
+        news.date
         for news in client.get(home_page_url).context['object_list']
     ]
     assert all_dates == sorted(all_dates, reverse=True)

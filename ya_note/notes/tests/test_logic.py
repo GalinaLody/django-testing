@@ -83,7 +83,7 @@ class TestActionsNote(CommonBaseTest):
             self.author_client.post(ADD_NOTE_URL, data=self.form_data),
             NOTE_SUCCESS_PAGE_URL
         )
-        self.assertEqual(Note.objects.count(),  initial_number_notes + 1)
+        self.assertEqual(Note.objects.count(), initial_number_notes + 1)
         new_note = Note.objects.get(slug=slugify(self.form_data['title']))
         self.assertEqual(new_note.slug, slugify(self.form_data['title']))
         self.assertEqual(new_note.title, self.form_data['title'])
@@ -97,7 +97,7 @@ class TestActionsNote(CommonBaseTest):
             self.author_client.post(EDIT_NOTE_URL, data=self.form_data),
             NOTE_SUCCESS_PAGE_URL
         )
-        self.assertEqual(Note.objects.count(),  initial_number_notes)
+        self.assertEqual(Note.objects.count(), initial_number_notes)
         new_note = Note.objects.get(slug=self.form_data['slug'])
         self.assertEqual(new_note.title, self.form_data['title'])
         self.assertEqual(new_note.text, self.form_data['text'])

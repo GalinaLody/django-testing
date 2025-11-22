@@ -62,6 +62,7 @@ def comment(author, news):
         text='Текст комментария'
     )
 
+
 @pytest.fixture
 def comments_list(news, author):
     Comment.objects.bulk_create(Comment(
