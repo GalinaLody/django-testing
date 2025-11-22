@@ -1,71 +1,60 @@
-import pytest
 from http import HTTPStatus
 
-from django.urls import reverse
-from pytest_lazyfixture import lazy_fixture
+
+import pytest
 from pytest_django.asserts import assertRedirects
+from pytest_lazyfixture import lazy_fixture
+from django.test.client import Client
 
 
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    'name, args',
-    [
-        ('news:home', None),
-        ('news:detail', lazy_fixture('news_id_for_args')),
-        ('users:login', None),
-        ('users:signup', None),
-        ('users:logout', None)
-    ]
-)
-def test_page_availability_for_anonymous_user(client, name, args):
-    """Главная страница, страница отдельной новости,
-    страница регистрации пользователя, сраница входа/выхода
-    доступны анонимному пользователю.
-    """
-    url = reverse(name, args=args)
-    if name == 'users:logout':
-        response = client.post(url)
-    else:
-        response = client.get(url)
-    assert response.status_code == HTTPStatus.OK
+HOME_PAGE_URL = lazy_fixture('home_page_url')
+NEWS_PAGE_URL = lazy_fixture('news_page_url')
+USER_LOGIN_URL = lazy_fixture('user_login_url')
+USER_SIGNUP_URL = lazy_fixture('user_signup_url')
+USER_LOGOUT_URL = lazy_fixture('user_logout_url')
+COMMENT_EDIT_URL = lazy_fixture('comment_edit_url')
+COMMENT_DELETE_URL = lazy_fixture('comment_delete_url')
+AUTHOR_CLIENT = lazy_fixture('author_client')
+NOT_AUTHOR_CLIENT = lazy_fixture('not_author_client')
+client = Client()
 
 
 @pytest.mark.parametrize(
-    'parametrized_client, expected_status',
-    [
-        (lazy_fixture('not_author_client'), HTTPStatus.NOT_FOUND),
-        (lazy_fixture('author_client'), HTTPStatus.OK)
-    ],
+    'url, parametrized_client, expected_status',
+    (
+        (HOME_PAGE_URL, client, HTTPStatus.OK),
+        (NEWS_PAGE_URL, client, HTTPStatus.OK),
+        (USER_LOGIN_URL, client, HTTPStatus.OK),
+        (USER_SIGNUP_URL, client, HTTPStatus.OK),
+        (USER_LOGOUT_URL, client, HTTPStatus.OK),
+        (COMMENT_EDIT_URL, AUTHOR_CLIENT, HTTPStatus.OK),
+        (COMMENT_DELETE_URL, AUTHOR_CLIENT, HTTPStatus.OK),
+        (COMMENT_EDIT_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND),
+        (COMMENT_DELETE_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND)
+    )
 )
-@pytest.mark.parametrize(
-    'name',
-    ('news:edit', 'news:delete'),
-)
-def test_pages_availability_for_different_users(
-        parametrized_client, name, comment_id_for_args, expected_status
+def test_pages_availability_for_different_users_and_anonymous(
+    parametrized_client, url, expected_status, user_logout_url
 ):
-    """Автор комментария может перейти на страницы редактирования
-    и удаления комментариев, авторизованный пользователь - нет.
-    """
-    url = reverse(name, args=comment_id_for_args)
-    response = parametrized_client.get(url)
+    """Проверяет доступность различных страниц сайта пользователям
+    в зависимости от их статуса:
+    анонимный пользователь, авторизованный пользователь, автор комментарий."""
+    if url == user_logout_url:
+        response = parametrized_client.post(url)
+    else:
+        response = parametrized_client.get(url)
     assert response.status_code == expected_status
 
 
 @pytest.mark.parametrize(
-    'name, args',
-    (
-        ('news:edit', lazy_fixture('comment_id_for_args')),
-        ('news:delete', lazy_fixture('comment_id_for_args')),
-    ),
+        'url',
+        (COMMENT_EDIT_URL, COMMENT_DELETE_URL)
 )
-def test_redirects(client, name, args):
+def test_redirects(client, url, user_login_url):
     """Анонимный пользователь, при попытке перейти на страницу
     удаления/редактирования комментариев перенаправляется
     на страницу авторизации.
     """
-    login_url = reverse('users:login')
-    url = reverse(name, args=args)
-    expected_url = f'{login_url}?next={url}'
+    expected_url = f'{user_login_url}?next={url}'
     response = client.get(url)
     assertRedirects(response, expected_url)

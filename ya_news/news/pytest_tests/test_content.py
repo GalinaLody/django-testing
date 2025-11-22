@@ -1,61 +1,74 @@
-import pytest
+from django.conf import settings
 
-from django.urls import reverse
-from pytest_lazyfixture import lazy_fixture
-
-
-@pytest.mark.usefixtures('news_11')
-def test_not_more_ten_news_on_home_page(client):
-    """Проверяет, что на главной странице
-    отображается не более 10 страниц.
-    """
-    url = reverse('news:home')
-    response = client.get(url)
-    object_list = response.context['object_list']
-    news_count = object_list.count()
-    assert news_count == 10
+from news.forms import CommentForm
 
 
-@pytest.mark.usefixtures('news_11')
-def test_news_order(client):
+def test_not_more_ten_news_on_home_page(
+        client,
+        home_page_url,
+        news_list_on_home_page
+):
+    """Проверяет, что на главной странице отображается не более 10 страниц."""
+    assert (
+        client.get(home_page_url).context['object_list'].count() ==
+        settings.NEWS_COUNT_ON_HOME_PAGE
+    )
+
+
+def test_news_order(
+        client,
+        home_page_url,
+        news_list_on_home_page
+):
     """Проверяет, что посты отсортированны по датам в порядке убывания."""
-    url = reverse('news:home')
-    response = client.get(url)
-    object_list = response.context['object_list']
-    all_dates = [news.date for news in object_list]
-    sorted_dates = sorted(all_dates, reverse=True)
-    assert all_dates == sorted_dates
+    all_dates = [
+        news.date 
+        for news in client.get(home_page_url).context['object_list']
+    ]
+    assert all_dates == sorted(all_dates, reverse=True)
 
 
-def comments_order(news, news_id_for_args, not_author_client):
+def test_comments_order(
+        news,
+        not_author_client,
+        news_page_url,
+        comments_list
+):
     """Проверяет, что комментарии на странице отсортированы
     в порядке возрастания.
     """
-    url = reverse('news:detail', args=news_id_for_args)
-    response = not_author_client.get(url)
-    news = response.context['news']
-    all_comments = news.comment_set.all()
-    all_comments_dates = [comment.created for comment in all_comments]
-    sorted_comments_dates = sorted(all_comments_dates)
-    assert all_comments_dates == sorted_comments_dates
-
-
-@pytest.mark.usefixtures('news')
-@pytest.mark.parametrize(
-    'parametrized_client, form_in_context',
-    (
-        (lazy_fixture('not_author_client'), True),
-        (lazy_fixture('client'), False),
+    all_comments = (
+        not_author_client
+        .get(news_page_url)
+        .context['news']
+        .comment_set.all()
     )
-)
-def test_add_comment_for_different_users(
-    parametrized_client,
-    form_in_context,
-    news_id_for_args
+    all_comments_dates = [comment.created for comment in all_comments]
+    assert (
+        [comment.created for comment in all_comments]
+        == sorted(all_comments_dates)
+    )
+
+
+def test_add_comment_for_authorized_user(
+    not_author_client,
+    news_page_url,
+    news
 ):
     """Проверяет, что форма для отправки комментов доступна
-    только авторизованному пользователю и не доступна анонимному.
+    только авторизованному пользователю.
     """
-    url = reverse('news:detail', args=news_id_for_args)
-    response = parametrized_client.get(url)
-    assert ('form' in response.context) is form_in_context
+    assert 'form' in not_author_client.get(news_page_url).context
+    assert isinstance(
+        not_author_client.get(news_page_url).context['form'],
+        CommentForm
+    )
+
+
+def test_not_add_comment_for_anonymous(
+    news_page_url,
+    news,
+    client
+):
+    """Проверяет, что форма для отправки комментов не доступна анонимному."""
+    assert 'form' not in client.get(news_page_url).context
