@@ -68,4 +68,3 @@ class CommonBaseTest(TestCase):
             'text': 'Новый текст заметки',
             'slug': 'new_slug'
         }
-
