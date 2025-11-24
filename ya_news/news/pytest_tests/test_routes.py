@@ -1,10 +1,9 @@
 from http import HTTPStatus
 
-
+from django.test.client import Client
 import pytest
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
-from django.test.client import Client
 
 
 HOME_PAGE_URL = lazy_fixture('home_page_url')
@@ -16,6 +15,15 @@ COMMENT_EDIT_URL = lazy_fixture('comment_edit_url')
 COMMENT_DELETE_URL = lazy_fixture('comment_delete_url')
 AUTHOR_CLIENT = lazy_fixture('author_client')
 NOT_AUTHOR_CLIENT = lazy_fixture('not_author_client')
+REDIRECT_NEWS_PAGE_TO_LOGIN_URL = lazy_fixture(
+    'redirect_news_page_to_user_login_url'
+)
+REDIRECT_COMMENT_EDIT_PAGE_TO_LOGIN_URL = lazy_fixture(
+    'redirect_comment_edit_page_to_login_url'
+)
+REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL = lazy_fixture(
+    'redirect_comment_delete_page_to_login_url'
+)
 client = Client()
 
 
@@ -30,7 +38,9 @@ client = Client()
         (COMMENT_EDIT_URL, AUTHOR_CLIENT, HTTPStatus.OK),
         (COMMENT_DELETE_URL, AUTHOR_CLIENT, HTTPStatus.OK),
         (COMMENT_EDIT_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND),
-        (COMMENT_DELETE_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND)
+        (COMMENT_DELETE_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND),
+        (REDIRECT_COMMENT_EDIT_PAGE_TO_LOGIN_URL, client, HTTPStatus.OK),
+        (REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL, client, HTTPStatus.OK)
     )
 )
 def test_pages_availability_for_different_users_and_anonymous(
@@ -47,12 +57,16 @@ def test_pages_availability_for_different_users_and_anonymous(
     assert response.status_code == expected_status
 
 
-@pytest.mark.parametrize('url', (COMMENT_EDIT_URL, COMMENT_DELETE_URL))
-def test_redirects(client, url, user_login_url):
+@pytest.mark.parametrize(
+        'url, expected_url',
+        (
+            (COMMENT_EDIT_URL, REDIRECT_COMMENT_EDIT_PAGE_TO_LOGIN_URL),
+            (COMMENT_DELETE_URL, REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL)
+        )
+    )
+def test_redirects(client, url, expected_url):
     """Анонимный пользователь, при попытке перейти на страницу
     удаления/редактирования комментариев перенаправляется
     на страницу авторизации.
     """
-    expected_url = f'{user_login_url}?next={url}'
-    response = client.get(url)
-    assertRedirects(response, expected_url)
+    assertRedirects(client.get(url), expected_url)

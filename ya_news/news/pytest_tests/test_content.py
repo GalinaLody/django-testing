@@ -50,7 +50,7 @@ def test_comments_order(
     )
 
 
-def test_add_comment_for_authorized_user(
+def test_comment_form_available_for_authenticated_user(
     not_author_client,
     news_page_url,
     news
@@ -58,14 +58,12 @@ def test_add_comment_for_authorized_user(
     """Проверяет, что форма для отправки комментов доступна
     только авторизованному пользователю.
     """
-    assert 'form' in not_author_client.get(news_page_url).context
-    assert isinstance(
-        not_author_client.get(news_page_url).context['form'],
-        CommentForm
-    )
+    response = not_author_client.get(news_page_url)
+    assert 'form' in response.context
+    assert isinstance(response.context['form'], CommentForm)
 
 
-def test_not_add_comment_for_anonymous(
+def test_comment_form_not_available_for_anonymous(
     news_page_url,
     news,
     client

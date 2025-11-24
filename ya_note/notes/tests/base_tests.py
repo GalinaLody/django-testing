@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -7,18 +9,33 @@ from notes.models import Note
 
 User = get_user_model()
 
-NOTE_SLUG = ('slug',)
+NOTE_SLUG = 'slug'
+
+OK = HTTPStatus.OK
+NOT_FOUND = HTTPStatus.NOT_FOUND
 
 ADD_NOTE_URL = reverse('notes:add')
-DELETE_NOTE_URL = reverse('notes:delete', args=NOTE_SLUG)
-DETAIL_NOTE_PAGE_URL = reverse('notes:detail', args=NOTE_SLUG)
-EDIT_NOTE_URL = reverse('notes:edit', args=NOTE_SLUG)
+DELETE_NOTE_URL = reverse('notes:delete', args=(NOTE_SLUG,))
+DETAIL_NOTE_PAGE_URL = reverse('notes:detail', args=(NOTE_SLUG,))
+EDIT_NOTE_URL = reverse('notes:edit', args=(NOTE_SLUG,))
 HOME_PAGE_URL = reverse('notes:home')
 NOTE_LIST_URL = reverse('notes:list')
 NOTE_SUCCESS_PAGE_URL = reverse('notes:success')
 USER_LOGIN_URL = reverse('users:login')
 USER_SIGNUP_URL = reverse('users:signup')
 USER_LOGOUT_URL = reverse('users:logout')
+REDIRECT_ADD_NOTE_TO_USER_LOGIN_URL = f'{USER_LOGIN_URL}?next={ADD_NOTE_URL}'
+REDIRECT_DETAIL_NOTE_TO_USER_LOGIN_URL = (
+    f'{USER_LOGIN_URL}?next={DETAIL_NOTE_PAGE_URL}'
+)
+REDIRECT_NOTE_SUCCESS_PAGE_TO_USER_LOGIN_URL = (
+    f'{USER_LOGIN_URL}?next={NOTE_SUCCESS_PAGE_URL}'
+)
+REDIRECT_NOTE_LIST_TO_USER_LOGIN_URL = f'{USER_LOGIN_URL}?next={NOTE_LIST_URL}'
+REDIRECT_EDIT_NOTE_TO_USER_LOGIN_URL = f'{USER_LOGIN_URL}?next={EDIT_NOTE_URL}'
+REDIRECT_DELETE_NOTE_TO_USER_LOGIN_URL = (
+    f'{USER_LOGIN_URL}?next={DELETE_NOTE_URL}'
+)
 
 
 class CommonBaseTest(TestCase):
@@ -37,14 +54,9 @@ class CommonBaseTest(TestCase):
         cls.author = User.objects.create(username='Автор')
         cls.author_client = Client()
         cls.author_client.force_login(cls.author)
-        cls.not_author = User.objects.create(username='Не автор')
-        cls.not_author_client = Client()
-        cls.not_author_client.force_login(cls.not_author)
-        cls.user = User.objects.create(
-            username='Любой залогиненный пользователь'
-        )
-        cls.user_client = Client()
-        cls.user_client.force_login(cls.user)
+        cls.reader = User.objects.create(username='Читатель-не автор')
+        cls.reader_client = Client()
+        cls.reader_client.force_login(cls.reader)
         cls.note = Note.objects.create(
             title='Заголовок',
             text='Текст заметки',
@@ -56,3 +68,4 @@ class CommonBaseTest(TestCase):
             'text': 'Новый текст заметки',
             'slug': 'new_slug'
         }
+

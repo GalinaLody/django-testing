@@ -24,11 +24,11 @@ class TestDetailNote(CommonBaseTest):
             self.note,
             self.author_client.get(NOTE_LIST_URL).context['object_list']
         )
-        note_from_db = Note.objects.get(slug=self.note.slug)
-        self.assertEqual(note_from_db.title, self.note.title)
-        self.assertEqual(note_from_db.text, self.note.text)
-        self.assertEqual(note_from_db.slug, self.note.slug)
-        self.assertEqual(note_from_db.author, self.note.author)
+        note_from_page = self.author_client.get(NOTE_LIST_URL).context['object_list'][0]
+        self.assertEqual(note_from_page.title, self.note.title)
+        self.assertEqual(note_from_page.text, self.note.text)
+        self.assertEqual(note_from_page.slug, self.note.slug)
+        self.assertEqual(note_from_page.author, self.note.author)
 
     def test_note_not_in_notes_list_not_author(self):
         """Проверяет, что отдельная заметка не передается в список заметок
@@ -36,7 +36,7 @@ class TestDetailNote(CommonBaseTest):
         """
         self.assertNotIn(
             self.note,
-            self.not_author_client.get(NOTE_LIST_URL).context['object_list']
+            self.reader_client.get(NOTE_LIST_URL).context['object_list']
         )
 
     def test_add_and_create_pages_has_form(self):
