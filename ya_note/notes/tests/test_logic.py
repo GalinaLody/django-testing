@@ -108,7 +108,7 @@ class TestActionsNote(CommonBaseTest):
         """Проверяет, пользователь не может редактировать чужие заметки."""
         old_notes_id = list(Note.objects.values_list('id', flat=True))
         self.assertEqual(
-            self.not_author_client.post(
+            self.reader_client.post(
                 EDIT_NOTE_URL,
                 data=self.form_data
             ).status_code,
