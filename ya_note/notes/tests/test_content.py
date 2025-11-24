@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 
 from notes.forms import NoteForm
-from notes.models import Note
 from notes.tests.base_tests import (
     CommonBaseTest,
     ADD_NOTE_URL,
@@ -24,7 +23,11 @@ class TestDetailNote(CommonBaseTest):
             self.note,
             self.author_client.get(NOTE_LIST_URL).context['object_list']
         )
-        note_from_page = self.author_client.get(NOTE_LIST_URL).context['object_list'][0]
+        note_from_page = (
+            self.author_client
+            .get(NOTE_LIST_URL)
+            .context['object_list'][0]
+        )
         self.assertEqual(note_from_page.title, self.note.title)
         self.assertEqual(note_from_page.text, self.note.text)
         self.assertEqual(note_from_page.slug, self.note.slug)

@@ -58,12 +58,12 @@ def test_pages_availability_for_different_users_and_anonymous(
 
 
 @pytest.mark.parametrize(
-        'url, expected_url',
-        (
-            (COMMENT_EDIT_URL, REDIRECT_COMMENT_EDIT_PAGE_TO_LOGIN_URL),
-            (COMMENT_DELETE_URL, REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL)
-        )
+    'url, expected_url',
+    (
+        (COMMENT_EDIT_URL, REDIRECT_COMMENT_EDIT_PAGE_TO_LOGIN_URL),
+        (COMMENT_DELETE_URL, REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL)
     )
+)
 def test_redirects(client, url, expected_url):
     """Анонимный пользователь, при попытке перейти на страницу
     удаления/редактирования комментариев перенаправляется
