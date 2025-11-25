@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import time
 
 import pytest
 from django.conf import settings
@@ -9,6 +8,7 @@ from django.urls import reverse
 from news.models import Comment, News
 
 COMMENTS_COUNT_ON_PAGE = 10
+
 
 @pytest.fixture(autouse=True)
 def enable_db_for_all(db):
