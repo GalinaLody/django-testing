@@ -28,36 +28,35 @@ class TestActionsNote(CommonBaseTest):
         """Проверяет, что залогиненный пользователь
         может создавать заметки.
         """
-        old_slugs = list(Note.objects.values_list('slug', flat=True))
+        slugs = list(Note.objects.values_list('slug', flat=True))
         self.assertRedirects(
             self.reader_client.post(ADD_NOTE_URL, data=self.form_data),
             NOTE_SUCCESS_PAGE_URL
         )
-        new_notes = Note.objects.exclude(slug__in=old_slugs)
-        self.assertEqual(new_notes.count(), 1)
-        new_note = new_notes.get()
-        self.assertEqual(new_note.title, self.form_data['title'])
-        self.assertEqual(new_note.text, self.form_data['text'])
-        self.assertEqual(new_note.slug, self.form_data['slug'])
-        self.assertEqual(new_note.author, self.reader)
+        notes = Note.objects.exclude(slug__in=slugs)
+        self.assertEqual(notes.count(), 1)
+        note = notes.get()
+        self.assertEqual(note.title, self.form_data['title'])
+        self.assertEqual(note.text, self.form_data['text'])
+        self.assertEqual(note.slug, self.form_data['slug'])
+        self.assertEqual(note.author, self.reader)
 
     def test_anonimous_cant_create_note(self):
         """Проверяет, что анонимный пользователь
         не может создавать заметки.
         """
-        old_slugs = list(Note.objects.values_list('slug', flat=True))
+        slugs = list(Note.objects.values_list('slug', flat=True))
         self.assertRedirects(
             self.client.post(ADD_NOTE_URL, data=self.form_data),
             REDIRECT_ADD_NOTE_TO_USER_LOGIN_URL
         )
-        new_notes = Note.objects.exclude(slug__in=old_slugs)
-        self.assertEqual(new_notes.count(), 0)
+        self.assertEqual(Note.objects.exclude(slug__in=slugs).count(), 0)
 
     def test_not_unique_slug(self):
         """Проверяет, что нельзя создать заметки
         с одинаковыми слагами.
         """
-        old_slugs = list(Note.objects.values_list('slug', flat=True))
+        slugs = list(Note.objects.values_list('slug', flat=True))
         self.form_data['slug'] = self.note.slug
         self.assertFormError(
             form=(
@@ -68,26 +67,25 @@ class TestActionsNote(CommonBaseTest):
             field='slug',
             errors=self.note.slug + WARNING
         )
-        new_notes = Note.objects.exclude(slug__in=old_slugs)
-        self.assertEqual(new_notes.count(), 0)
+        self.assertEqual(Note.objects.exclude(slug__in=slugs).count(), 0)
 
     def test_empty_slug(self):
         """Проверяет, что при создании заметки с пустым полем для слага
         слаг формируетс автоматически из названия.
         """
-        old_slugs = list(Note.objects.values_list('slug', flat=True))
+        slugs = list(Note.objects.values_list('slug', flat=True))
         self.form_data.pop('slug')
         self.assertRedirects(
             self.author_client.post(ADD_NOTE_URL, data=self.form_data),
             NOTE_SUCCESS_PAGE_URL
         )
-        new_notes = Note.objects.exclude(slug__in=old_slugs)
-        self.assertEqual(new_notes.count(), 1)
-        new_note = new_notes.get()
-        self.assertEqual(new_note.slug, slugify(self.form_data['title']))
-        self.assertEqual(new_note.title, self.form_data['title'])
-        self.assertEqual(new_note.text, self.form_data['text'])
-        self.assertEqual(new_note.author, self.author)
+        notes = Note.objects.exclude(slug__in=slugs)
+        self.assertEqual(notes.count(), 1)
+        note = notes.get()
+        self.assertEqual(note.slug, slugify(self.form_data['title']))
+        self.assertEqual(note.title, self.form_data['title'])
+        self.assertEqual(note.text, self.form_data['text'])
+        self.assertEqual(note.author, self.author)
 
     def test_author_can_edit_note(self):
         """Проверяет, что пользователь может редактировать свои заметки."""
@@ -128,13 +126,12 @@ class TestActionsNote(CommonBaseTest):
 
     def test_not_author_cant_delete_note(self):
         """Проверяет, что пользователь не может удалять чужие заметки."""
-        old_notes_id = list(Note.objects.values_list('id', flat=True))
+        notes_ids = list(Note.objects.values_list('id', flat=True))
         self.assertEqual(
             self.reader_client.delete(DELETE_NOTE_URL).status_code,
             HTTPStatus.NOT_FOUND
         )
-        notes = Note.objects.exclude(id__in=old_notes_id)
-        self.assertEqual(notes.count(), 0)
+        self.assertEqual(Note.objects.exclude(id__in=notes_ids).count(), 0)
         note = Note.objects.get(id=self.note.id)
         self.assertEqual(note.title, self.note.title)
         self.assertEqual(note.text, self.note.text)

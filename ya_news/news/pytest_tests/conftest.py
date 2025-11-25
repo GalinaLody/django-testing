@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from news.models import Comment, News
 
+COMMENTS_COUNT_ON_PAGE = 10
 
 @pytest.fixture(autouse=True)
 def enable_db_for_all(db):
@@ -66,13 +67,12 @@ def comment(author, news):
 
 @pytest.fixture
 def comments_list(news, author):
-    for index in range(settings.COMMENTS_COUNT_ON_PAGE + 1):
+    for index in range(COMMENTS_COUNT_ON_PAGE + 1):
         Comment.objects.create(
             news=news,
             author=author,
             text=f'Текст комментария{index}'
         )
-        time.sleep(1)
 
 
 @pytest.fixture

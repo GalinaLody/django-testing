@@ -114,16 +114,16 @@ def test_not_author_cant_delete_comment(
 @pytest.mark.parametrize('form_comment_bed_words', FORM_COMMENT_BED_WORDS)
 def test_user_cant_use_bad_words(
         author_client,
-        comment_edit_url, form_comment_bed_words
+        news_page_url, form_comment_bed_words
 ):
     """Если комментарий содержит запрещённые слова, он не будет опубликован,
     а форма вернёт ошибку.
     """
     assertFormError(
         author_client.post(
-            comment_edit_url,
+            news_page_url,
             data=form_comment_bed_words
         ).context['form'],
         'text', errors=WARNING
     )
-    assert Comment.objects.count() == 1
+    assert Comment.objects.count() == 0
