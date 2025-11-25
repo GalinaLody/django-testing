@@ -13,6 +13,7 @@ NOTE_SLUG = 'slug'
 
 OK = HTTPStatus.OK
 NOT_FOUND = HTTPStatus.NOT_FOUND
+FOUND = HTTPStatus.FOUND
 
 ADD_NOTE_URL = reverse('notes:add')
 DELETE_NOTE_URL = reverse('notes:delete', args=(NOTE_SLUG,))

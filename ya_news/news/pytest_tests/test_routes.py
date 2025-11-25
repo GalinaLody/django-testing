@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from django.test.client import Client
 import pytest
+from django.test.client import Client
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
 
@@ -40,7 +40,10 @@ client = Client()
         (COMMENT_EDIT_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND),
         (COMMENT_DELETE_URL, NOT_AUTHOR_CLIENT, HTTPStatus.NOT_FOUND),
         (REDIRECT_COMMENT_EDIT_PAGE_TO_LOGIN_URL, client, HTTPStatus.OK),
-        (REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL, client, HTTPStatus.OK)
+        (REDIRECT_COMMENT_DELETE_PAGE_TO_LOGIN_URL, client, HTTPStatus.OK),
+        (REDIRECT_NEWS_PAGE_TO_LOGIN_URL, client, HTTPStatus.OK),
+        (COMMENT_EDIT_URL, client, HTTPStatus.FOUND),
+        (COMMENT_DELETE_URL, client, HTTPStatus.FOUND),
     )
 )
 def test_pages_availability_for_different_users_and_anonymous(
@@ -50,11 +53,12 @@ def test_pages_availability_for_different_users_and_anonymous(
     в зависимости от их статуса:
     анонимный пользователь, авторизованный пользователь, автор комментарий.
     """
-    if url == user_logout_url:
-        response = parametrized_client.post(url)
-    else:
-        response = parametrized_client.get(url)
-    assert response.status_code == expected_status
+    method = (
+        parametrized_client.post
+        if url == user_logout_url
+        else parametrized_client.get
+    )
+    assert method(url).status_code == expected_status
 
 
 @pytest.mark.parametrize(

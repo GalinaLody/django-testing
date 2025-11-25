@@ -19,7 +19,7 @@ from notes.tests.base_tests import (
     REDIRECT_NOTE_LIST_TO_USER_LOGIN_URL,
     REDIRECT_EDIT_NOTE_TO_USER_LOGIN_URL,
     REDIRECT_DELETE_NOTE_TO_USER_LOGIN_URL,
-    OK, NOT_FOUND
+    OK, NOT_FOUND, FOUND
 
 )
 
@@ -47,19 +47,31 @@ class TestRoutes(CommonBaseTest):
             [self.client, USER_LOGIN_URL, OK],
             [self.client, USER_SIGNUP_URL, OK],
             [self.client, USER_LOGOUT_URL, OK],
+            [self.reader_client, HOME_PAGE_URL, OK],
+            [self.reader_client, USER_LOGIN_URL, OK],
+            [self.reader_client, USER_SIGNUP_URL, OK],
+            [self.reader_client, USER_LOGOUT_URL, OK],
             [self.client, REDIRECT_ADD_NOTE_TO_USER_LOGIN_URL, OK],
             [self.client, REDIRECT_DETAIL_NOTE_TO_USER_LOGIN_URL, OK],
             [self.client, REDIRECT_NOTE_SUCCESS_PAGE_TO_USER_LOGIN_URL, OK],
             [self.client, REDIRECT_NOTE_LIST_TO_USER_LOGIN_URL, OK],
             [self.client, REDIRECT_EDIT_NOTE_TO_USER_LOGIN_URL, OK],
-            [self.client, REDIRECT_DELETE_NOTE_TO_USER_LOGIN_URL, OK]
+            [self.client, REDIRECT_DELETE_NOTE_TO_USER_LOGIN_URL, OK],
+            [self.client,  ADD_NOTE_URL, FOUND],
+            [self.client,  DETAIL_NOTE_PAGE_URL, FOUND],
+            [self.client,  NOTE_SUCCESS_PAGE_URL, FOUND],
+            [self.client,  NOTE_LIST_URL, FOUND],
+            [self.client,  EDIT_NOTE_URL, FOUND],
+            [self.client,  DELETE_NOTE_URL, FOUND],
         ]
-        for user, url, status in users_statuses:
-            with self.subTest(user=user, url=url, status=status):
-                if url == USER_LOGOUT_URL:
-                    self.assertEqual(user.post(url).status_code, status)
-                else:
-                    self.assertEqual(user.get(url).status_code, status)
+        for user_client, url, status in users_statuses:
+            with self.subTest(user_client=user_client, url=url, status=status):
+                method = (
+                    user_client.post
+                    if url == USER_LOGOUT_URL
+                    else user_client.get
+                )
+                self.assertEqual(method(url).status_code, status)
 
     def test_redirect_for_anonymous_user(self):
         """Проверка редиректа анонимного пользователя со страниц

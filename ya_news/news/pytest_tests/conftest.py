@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import time
 
 import pytest
 from django.conf import settings
@@ -65,12 +66,13 @@ def comment(author, news):
 
 @pytest.fixture
 def comments_list(news, author):
-    Comment.objects.bulk_create(Comment(
-        news=news,
-        author=author,
-        text=f'Текст комментария{index}',
-        created=datetime.today() - timedelta(days=index)
-    )for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1))
+    for index in range(settings.COMMENTS_COUNT_ON_PAGE + 1):
+        Comment.objects.create(
+            news=news,
+            author=author,
+            text=f'Текст комментария{index}'
+        )
+        time.sleep(1)
 
 
 @pytest.fixture

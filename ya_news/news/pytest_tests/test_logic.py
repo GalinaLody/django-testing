@@ -8,10 +8,7 @@ from news.models import Comment
 
 
 FORM_COMMENT_DATA = {'text': 'Другой комментарий'}
-FORM_COMMENT_BED_WORDS = [
-    {'text': f'Какой-то текст, {bad_word}, еще текст'}
-    for bad_word in BAD_WORDS
-]
+FORM_COMMENT_BED_WORDS = [{'text': bad_word} for bad_word in BAD_WORDS]
 
 
 def test_user_can_create_comment(
@@ -39,12 +36,11 @@ def test_anonymous_user_cant_create_comment(
     redirect_news_page_to_user_login_url,
 ):
     """Анонимный пользователь не может отправить комментарий."""
-    initial_number_comments = Comment.objects.count()
     assertRedirects(
         client.post(news_page_url, data=FORM_COMMENT_DATA),
         redirect_news_page_to_user_login_url
     )
-    assert Comment.objects.count() == initial_number_comments
+    assert Comment.objects.count() == 0
 
 
 def test_author_can_edit_comment(
@@ -117,7 +113,7 @@ def test_not_author_cant_delete_comment(
 
 @pytest.mark.parametrize('form_comment_bed_words', FORM_COMMENT_BED_WORDS)
 def test_user_cant_use_bad_words(
-        author_client, comment,
+        author_client,
         comment_edit_url, form_comment_bed_words
 ):
     """Если комментарий содержит запрещённые слова, он не будет опубликован,

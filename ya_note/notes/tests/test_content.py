@@ -19,19 +19,13 @@ class TestDetailNote(CommonBaseTest):
         """Проверяет, что отдельная заметка
         передается в список заметок автора.
         """
-        self.assertIn(
-            self.note,
-            self.author_client.get(NOTE_LIST_URL).context['object_list']
-        )
-        note_from_page = (
-            self.author_client
-            .get(NOTE_LIST_URL)
-            .context['object_list'][0]
-        )
-        self.assertEqual(note_from_page.title, self.note.title)
-        self.assertEqual(note_from_page.text, self.note.text)
-        self.assertEqual(note_from_page.slug, self.note.slug)
-        self.assertEqual(note_from_page.author, self.note.author)
+        response = self.author_client.get(NOTE_LIST_URL).context['object_list']
+        self.assertIn(self.note, response)
+        note = response[0]
+        self.assertEqual(note.title, self.note.title)
+        self.assertEqual(note.text, self.note.text)
+        self.assertEqual(note.slug, self.note.slug)
+        self.assertEqual(note.author, self.note.author)
 
     def test_note_not_in_notes_list_not_author(self):
         """Проверяет, что отдельная заметка не передается в список заметок
