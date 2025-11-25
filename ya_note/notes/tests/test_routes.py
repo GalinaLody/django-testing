@@ -57,12 +57,12 @@ class TestRoutes(CommonBaseTest):
             [self.client, REDIRECT_NOTE_LIST_TO_USER_LOGIN_URL, OK],
             [self.client, REDIRECT_EDIT_NOTE_TO_USER_LOGIN_URL, OK],
             [self.client, REDIRECT_DELETE_NOTE_TO_USER_LOGIN_URL, OK],
-            [self.client,  ADD_NOTE_URL, FOUND],
-            [self.client,  DETAIL_NOTE_PAGE_URL, FOUND],
-            [self.client,  NOTE_SUCCESS_PAGE_URL, FOUND],
-            [self.client,  NOTE_LIST_URL, FOUND],
-            [self.client,  EDIT_NOTE_URL, FOUND],
-            [self.client,  DELETE_NOTE_URL, FOUND],
+            [self.client, ADD_NOTE_URL, FOUND],
+            [self.client, DETAIL_NOTE_PAGE_URL, FOUND],
+            [self.client, NOTE_SUCCESS_PAGE_URL, FOUND],
+            [self.client, NOTE_LIST_URL, FOUND],
+            [self.client, EDIT_NOTE_URL, FOUND],
+            [self.client, DELETE_NOTE_URL, FOUND],
         ]
         for user_client, url, status in users_statuses:
             with self.subTest(user_client=user_client, url=url, status=status):
