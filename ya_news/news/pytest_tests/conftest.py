@@ -68,10 +68,13 @@ def comment(author, news):
 @pytest.fixture
 def comments_list(news, author):
     for index in range(COMMENTS_COUNT_ON_PAGE + 1):
-        Comment.objects.create(
+        comment = Comment.objects.create(
             news=news,
             author=author,
             text=f'Текст комментария{index}'
+        )
+        Comment.objects.filter(id=comment.id).update(
+            created=datetime.today() - timedelta(days=index)
         )
 
 
